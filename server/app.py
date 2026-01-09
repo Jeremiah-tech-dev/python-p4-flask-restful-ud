@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 from flask import Flask, request, make_response
-from flask_migrate import Migrate
 from flask_restful import Api, Resource
-
 from models import db, Newsletter
 
 app = Flask(__name__)
@@ -11,9 +9,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///newsletters.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
-migrate = Migrate(app, db)
 db.init_app(app)
-
 api = Api(app)
 
 class Home(Resource):
@@ -76,6 +72,40 @@ class NewsletterByID(Resource):
         response = make_response(
             response_dict,
             200,
+        )
+
+        return response
+
+    def patch(self, id):
+
+        record = Newsletter.query.filter_by(id=id).first()
+        for attr in request.form:
+            setattr(record, attr, request.form[attr])
+
+        db.session.add(record)
+        db.session.commit()
+
+        response_dict = record.to_dict()
+
+        response = make_response(
+            response_dict,
+            200
+        )
+
+        return response
+
+    def delete(self, id):
+
+        record = Newsletter.query.filter_by(id=id).first()
+
+        db.session.delete(record)
+        db.session.commit()
+
+        response_dict = {"message": "record successfully deleted"}
+
+        response = make_response(
+            response_dict,
+            200
         )
 
         return response

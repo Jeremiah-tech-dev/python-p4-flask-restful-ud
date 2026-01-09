@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy_serializer import SerializerMixin
+from serializer import SerializerMixin
 
 db = SQLAlchemy()
 
